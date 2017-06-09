@@ -1,0 +1,11 @@
+{
+  "name": "@suning/dubhe-component-http",
+  "version": "0.0.11",
+  "description": "dubhe http service for cd",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yanjie",
+  "license": "ISC"
+}
