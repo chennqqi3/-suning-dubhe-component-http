@@ -9,7 +9,15 @@ $ npm install @suning/dubhe-component-http --save
 ```js
 import httpService from '@suning/dubhe-component-http';
 
-httpService(app);
-
-//可以依赖注入HttpService服务了
+option = {
+    errorHandle:{
+        resultCode:[{
+            code:'03001',
+            callback:function () {
+                location.href = '/error.html'
+            }
+        }]
+    }
+}
+httpService(app, option);//已注入HttpService服务了
 ```
