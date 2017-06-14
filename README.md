@@ -1,4 +1,4 @@
-cd项目dubhe框架的HttpService
+cd项目dubhe框架的HttpService，支持苏宁内网passport及cupid独立passport的登入、登出及单点登陆
 
 # Usage
 
@@ -35,3 +35,7 @@ add loginService.logout
 ## 0.0.15
 
 add loginService.config
+
+## 0.0.24
+
+增加静态的logout方法
