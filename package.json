@@ -1,6 +1,6 @@
 {
   "name": "@suning/dubhe-component-http",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "description": "dubhe http service for cd",
   "main": "index.js",
   "scripts": {
