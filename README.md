@@ -14,12 +14,15 @@ option = {
         resultCode: [{
             code: '03001',
             callback: function () {
-                location.href = '/error.html'
+                http.loginService.logout({
+                    beforeService: 'cupidAdminAuth=false',
+                    service: location.origin + '/error.html'
+                })
             }
         }],
         config: {
             successCode: '0',
-            alertMessage: true
+            alertMessage: false
         }
     }
 }
