@@ -1,6 +1,4 @@
-'use strict';
-
-var main = function main(app) {
+var main = function (app) {
     app.service("LoginService", ['baseUrl', function (baseUrl) {
         /* passport相关的东西 */
         var loginCallbackStack = [];
@@ -15,15 +13,15 @@ var main = function main(app) {
         function jumpLogin(data) {
             // document.cookie = "authId=1; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.cnsuning.com; path=/;";
             if (data.redirectUrl) {
-                window.location.href = data.redirectUrl;
+                window.location.href = data.redirectUrl
             } else {
                 var newlocationHref = location.origin + config.base + 'auth?targetUrl=' + location.href;
                 if (location.host.match('sit')) {
-                    window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref);
+                    window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref)
                 } else if (location.host == 'my.cnsuning.com') {
-                    window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref);
+                    window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref)
                 } else {
-                    window.location.href = 'https://sso.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref);
+                    window.location.href = 'https://sso.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref)
                 }
             }
         }
@@ -31,7 +29,8 @@ var main = function main(app) {
         function popupLoginContainer() {
             if (typeof intervalVar == 'undefined') {
                 currentLocation = window.location.href;
-                var src = (typeof config.successCallbackUrl == 'undefined' ? config.base + "popupLoginSuccess?" : config.successCallbackUrl) + "topLocation=" + encodeURIComponent(currentLocation) + "&loginTheme=" + config.loginTheme;
+                var src = ((typeof config.successCallbackUrl == 'undefined') ?
+                    (config.base + "popupLoginSuccess?") : config.successCallbackUrl) + "topLocation=" + encodeURIComponent(currentLocation) + "&loginTheme=" + config.loginTheme;
 
                 document.getElementById('modalOverlay').style.display = 'block';
                 document.getElementById('modalContainer').style.display = 'block';
@@ -57,7 +56,7 @@ var main = function main(app) {
             document.getElementById('modalOverlay').style.display = 'none';
             document.getElementById('modalContainer').style.display = 'none';
             document.getElementById("iframeLogin").src = '';
-            window.location.href = currentLocation.indexOf('#') == -1 ? currentLocation + "#unknown" : currentLocation;
+            window.location.href = (currentLocation.indexOf('#') == -1) ? currentLocation + "#unknown" : currentLocation;
             clearInterval(intervalVar);
             intervalVar = undefined;
         }
@@ -126,73 +125,68 @@ var main = function main(app) {
             //add hw 2015-06-30
             popupClose: popupClose,
             jumpLogin: jumpLogin,
-            logout: logout
+            logout,
         };
     }]);
-};
-
-var authId, env;
-
-function cupidlogout() {
-    var option = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    //非sn passport
-    document.cookie = 'is_cupid_auth=false; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.cnsuning.com; path=/;';
-    location.href = 'http://cupidsit.cnsuning.com/cupid/session/logout?' + authId + (option.beforeService ? '&' + option.beforeService : '') + '&service=' + encodeURIComponent(option.service ? option.service : location.origin + '/cupid/auth?targetUrl=' + location.href);
 }
 
-function snlogout() {
-    var option = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+var authId, env
 
+function cupidlogout(option = {}) {
+    //非sn passport
+    document.cookie = 'is_cupid_auth=false; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.cnsuning.com; path=/;'
+    location.href = 'http://cupidsit.cnsuning.com/cupid/session/logout?' + authId + (option.beforeService ? '&' + option.beforeService : '') + '&service=' + encodeURIComponent(option.service ? option.service : (location.origin) + '/cupid/auth?targetUrl=' + (location.href))
+}
+
+function snlogout(option = {}) {
     //sn passport
     if (location.hostname.match('sit')) {
-        location.href = 'http://ssosit.cnsuning.com/ids/logout?service=' + encodeURIComponent(option.service ? option.service : location.href);
+        location.href = 'http://ssosit.cnsuning.com/ids/logout?service=' + encodeURIComponent(option.service ? option.service : location.href)
     } else if (location.hostname.match('pre')) {
-        location.href = 'http://ssopre.cnsuning.com/ids/logout?service=' + encodeURIComponent(option.service ? option.service : location.href);
+        location.href = 'http://ssopre.cnsuning.com/ids/logout?service=' + encodeURIComponent(option.service ? option.service : location.href)
     } else {
-        location.href = 'http://sso.cnsuning.com/ids/logout?service=http://snds.cnsuning.com/';
+        location.href = 'http://sso.cnsuning.com/ids/logout?service=http://snds.cnsuning.com/'
     }
 }
 
 function detectEnv() {
-    var cookies = document.cookie.split(';');
-    var is_cupid_auth = false;
+    var cookies = document.cookie.split(';')
+    var is_cupid_auth = false
     if (cookies) {
-        cookies.forEach(function (e) {
+        cookies.forEach(e => {
             if (/authId/.test(e)) {
-                authId = e.trim();
+                authId = e.trim()
             }
             if (/is_cupid_auth/.test(e)) {
-                is_cupid_auth = true;
+                is_cupid_auth = true
             }
-        });
+        })
     }
     if (is_cupid_auth) {
-        return 'cupid';
+        return 'cupid'
     } else {
-        return 'sn';
+        return 'sn'
     }
 }
 
 function logout(option) {
     if (!env) {
-        env = detectEnv();
+        env = detectEnv()
     }
     switch (env) {
         case 'sn':
-            snlogout(option);
-            return;
+            snlogout(option)
+            return
         case 'cupid':
-            cupidlogout(option);
-            return;
+            cupidlogout(option)
+            return
         default:
-            break;
+            break
     }
 }
 
 main.fn = {
-    logout: logout
-};
+    logout
+}
 
-module.exports = main;
-//# sourceMappingURL=loginService.js.map
+module.exports = main
