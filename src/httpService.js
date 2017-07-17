@@ -1,4 +1,6 @@
-module.exports = function (app) {
+module.exports = function (app, httpOpt = {
+    httpLoading: 'manual'
+}) {
     var loadNum = 0
     app.factory('Loading', () => (status, url) => {
         var onloadingDiv = document.getElementById('onloadingDiv')
@@ -17,9 +19,39 @@ module.exports = function (app) {
             }
         }
     })
+    app.service('HttpSetting', [function () {
+        let setting = {}
+
+        function add(name, value) {
+            setting[name] = value
+        }
+
+        function match(name) {
+            let names = Object.keys(setting)
+            for (let i = 0; i < names.length; i++) {
+                if (name.match(names[i])) {
+                    return {
+                        name: names[i],
+                        permHeader: setting[names[i]]
+                    }
+                }
+            }
+            return {}
+        }
+
+        function remove(name) {
+            delete setting[name]
+        }
+
+        return {
+            add,
+            match,
+            remove
+        }
+    }])
     app.service("HttpService", ["$http", "$q", "$document", "$location",
-        "AlertService", "LoginService", "EventBus", "baseUrl", 'Loading', "ErrorHandle",
-        function ($http, $q, $document, $location, AlertService, LoginService, EventBus, baseUrl, Loading, ErrorHandle) {
+        "AlertService", "LoginService", "EventBus", "baseUrl", 'Loading', "ErrorHandle", "HttpSetting",
+        function ($http, $q, $document, $location, AlertService, LoginService, EventBus, baseUrl, Loading, ErrorHandle, HttpSetting) {
             var loginUrl = LoginService.config.base + 'authStatus?callback=JSON_CALLBACK&_t=' + (+new Date());
 
             function busy(url) {
@@ -35,9 +67,17 @@ module.exports = function (app) {
             function sendRequest(url, params, method, option) {
                 var data, config
                 var defer = $q.defer();
-                if (!option || (option && !option.notDisplayLoading)) {
-                    busy(url);
+
+                if (httpOpt && httpOpt.httpLoading === 'manual') {
+                    if (option && option.displayLoading) {
+                        busy(url);
+                    }
+                } else {
+                    if (!option || (option && !option.notDisplayLoading)) {
+                        busy(url);
+                    }
                 }
+
 
                 resourceCode(option)
 
@@ -55,6 +95,20 @@ module.exports = function (app) {
                 }
 
                 $http.defaults.headers.common['currentUrl'] = location.href;
+
+                //如果url匹配，设置权限设置头部
+                let {
+                    name,
+                    permHeader
+                } = HttpSetting.match(url)
+                if (permHeader) {
+                    for (let i in permHeader) {
+                        $http.defaults.headers.common[i] = permHeader[i]
+                    }
+                    if (permHeader.isMajorData) {
+                        HttpSetting.remove(name)
+                    }
+                }
 
                 $http[method](url, data, config).success(function (result) {
                     idle();
@@ -82,6 +136,10 @@ module.exports = function (app) {
                     }
                     defer.reject(reason);
                 });
+
+                for (let i in permHeader) {
+                    delete $http.defaults.headers.common[i]
+                }
 
                 return defer.promise;
             }

@@ -16,7 +16,7 @@ var main = function (app) {
                 window.location.href = data.redirectUrl
             } else {
                 var newlocationHref = location.origin + config.base + 'auth?targetUrl=' + location.href;
-                if (location.host.match('sit')) {
+                if (location.host.match('sit') || location.host.match('dev')) {
                     window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref)
                 } else if (location.host == 'my.cnsuning.com') {
                     window.location.href = 'https://ssosit.cnsuning.com/ids/login?loginTheme=' + config.loginTheme + '&service=' + encodeURIComponent(newlocationHref)

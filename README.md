@@ -22,7 +22,8 @@ option = {
         }],
         config: {
             successCode: '0',
-            alertMessage: false
+            alertMessage: true,
+            noMsgCode: '-1'
         }
     }
 }

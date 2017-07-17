@@ -1,4 +1,10 @@
-module.exports = function (app, option) {
+module.exports = function (app, option = {
+    resultCode: [],
+    config: {
+        successCode: '0',
+        alertMessage: true,
+    }
+}) {
     app.constant('errors', {
         500: '系统出了点小问题，请稍后重试！',
         401: {
@@ -32,11 +38,13 @@ module.exports = function (app, option) {
 
                     if (data.resultCode === option.config.successCode) {
                         defer.resolve(data.data);
-                    } else if (option.config.alertMessage) {
-                        AlertService.alert({
-                            title: '提示信息',
-                            content: message
-                        });
+                    } else {
+                        if (option.config.alertMessage && data.resultCode !== option.config.noMsgCode) {
+                            AlertService.alert({
+                                title: '提示信息',
+                                content: message
+                            });
+                        }
                         defer.reject(data);
                     }
                     return defer.promise;

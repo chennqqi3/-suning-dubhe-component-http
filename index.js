@@ -1,14 +1,17 @@
-var httpService = require('./lib/httpService.js')
-var loginService = require('./lib/loginService.js')
-var errorHandle = require('./lib/errorHandle.js')
+let httpService = require('./lib/httpService.js')
+let loginService = require('./lib/loginService.js')
+let errorHandle = require('./lib/errorHandle.js')
+let userService = require('./lib/userService.js')
 
-var main = function main(app, option) {
+let main = function main(app, option) {
+    option = option || {}
     app.config(function ($httpProvider) {
         $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     });
     errorHandle(app, option.errorHandle)
     loginService(app, option.loginService)
     httpService(app, option.httpService)
+    userService(app)
 }
 main.loginService = loginService.fn
 
