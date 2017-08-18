@@ -24,6 +24,15 @@ option = {
             successCode: '0',
             alertMessage: true,
             noMsgCode: '-1'
+        },
+        appIdHandler: function (d) {
+            if (d && !d.resultCode) {
+                if (!sessionStorage.getItem("appId")) {
+                    return {
+                        message: '缺少应用Id'
+                    }
+                }
+            }
         }
     }
 }
@@ -43,3 +52,11 @@ add loginService.config
 ## 0.0.24
 
 增加静态的logout方法
+
+## 0.0.53
+
+修复iframe中logout返回的地址为phoebus系统
+
+## 0.0.54
+
+add appIdHandler for phoebus

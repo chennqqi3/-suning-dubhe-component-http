@@ -3,6 +3,5 @@ module.exports = function (app) {
         let loginUrl = LoginService.config.base + 'authStatus?callback=JSON_CALLBACK&_t=' + (+new Date());
 
         return $http.jsonp(loginUrl)
-
     }])
 }

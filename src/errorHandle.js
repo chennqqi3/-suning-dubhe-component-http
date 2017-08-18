@@ -22,9 +22,23 @@ module.exports = function (app, option = {
                         defaultMessage = '系统出了点小问题，请稍后重试！',
                         message = data.message || defaultMessage;
 
+                    //phoebus进入页面时，提示缺少appId
+                    if (option.appIdHandler) {
+                        let reject = option.appIdHandler(data)
+                        if (reject) {
+                            AlertService.alert({
+                                title: '提示信息',
+                                content: reject.message
+                            });
+                            defer.reject(data);
+                            return defer.promise;
+                        }
+                    }
+
                     if (data.idsIntercepted) {
                         LoginService.jumpLogin(data);
-                        return
+                        defer.reject(data);
+                        return defer.promise;
                     }
 
                     var resultCode = option.resultCode

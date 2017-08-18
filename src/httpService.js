@@ -50,8 +50,8 @@ module.exports = function (app, httpOpt = {
         }
     }])
     app.service("HttpService", ["$http", "$q", "$document", "$location",
-        "AlertService", "LoginService", "EventBus", "baseUrl", 'Loading', "ErrorHandle", "HttpSetting",
-        function ($http, $q, $document, $location, AlertService, LoginService, EventBus, baseUrl, Loading, ErrorHandle, HttpSetting) {
+        "AlertService", "LoginService", "EventBus", "baseUrl", 'Loading', "ErrorHandle", "HttpSetting", "majorDataEntityTypeName",
+        function ($http, $q, $document, $location, AlertService, LoginService, EventBus, baseUrl, Loading, ErrorHandle, HttpSetting, majorDataEntityTypeName) {
             var loginUrl = LoginService.config.base + 'authStatus?callback=JSON_CALLBACK&_t=' + (+new Date());
 
             function busy(url) {
@@ -109,6 +109,10 @@ module.exports = function (app, httpOpt = {
                         HttpSetting.remove(name)
                     }
                 }
+                if (window !== window.top) {
+                    $http.defaults.headers.common.majorDataEntityTypeName = majorDataEntityTypeName
+                    $http.defaults.headers.common.majorDataId = window.top.sessionStorage.getItem("appId");
+                }
 
                 $http[method](url, data, config).success(function (result) {
                     idle();
@@ -122,19 +126,12 @@ module.exports = function (app, httpOpt = {
                 }).error(function (reason, status) {
                     idle();
 
-                    var errorContent = reason;
-                    if (reason != undefined && reason.errorresponse != undefined) {
-                        errorContent = reason.errorresponse.errortext;
-                    }
-
-                    if (status) {
-                        AlertService.alert({
-                            title: "服务端异常",
-                            content: '系统出了点小问题，请稍后重试！'
-                            //content: errorContent
+                    ErrorHandle.handle(reason)
+                        .then(function (data) {
+                            defer.resolve(data);
+                        }, function (data) {
+                            defer.reject(data);
                         });
-                    }
-                    defer.reject(reason);
                 });
 
                 for (let i in permHeader) {
